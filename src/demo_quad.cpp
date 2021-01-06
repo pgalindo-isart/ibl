@@ -48,7 +48,7 @@ DemoQuad::DemoQuad(const DemoInputs& inputs)
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     }
 
-    // Vertex format
+    // Vertex layout
     {
         glGenVertexArrays(1, &vertexArrayObject);
         glBindVertexArray(vertexArrayObject);
@@ -66,9 +66,9 @@ DemoQuad::DemoQuad(const DemoInputs& inputs)
     program = gl::CreateBasicProgram(
         // Vertex shader
         R"GLSL(
-        in vec3 aPosition;
-        in vec4 aColor;
-        in vec2 aUV;
+        layout(location = 0) in vec3 aPosition;
+        layout(location = 1) in vec4 aColor;
+        layout(location = 2) in vec2 aUV;
 
         out vec4 vColor;
         out vec2 vUV;

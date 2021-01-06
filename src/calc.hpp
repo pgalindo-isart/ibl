@@ -43,9 +43,26 @@ namespace calc
     inline float ToRadians(float degrees) { return degrees * TAU / 360.f; }
 }
 
-
-inline float3 operator+(float3 a, float3 b) { return { a.x + b.x, a.y + b.y, a.z + b.z }; }
 inline float3 operator-(float3 a) { return { -a.x, -a.y, -a.z }; }
+inline float3 operator+(float3 a, float3 b) { return { a.x + b.x, a.y + b.y, a.z + b.z }; }
+inline float3 operator-(float3 a, float3 b) { return { a.x - b.x, a.y - b.y, a.z - b.z }; }
+inline float3 operator*(float3 a, float3 b) { return { a.x * b.x, a.y * b.y, a.z * b.z }; }
+inline float3 operator/(float3 a, float3 b) { return { a.x / b.x, a.y / b.y, a.z / b.z }; }
+
+inline float3 operator+(float3 a, float b) { return { a.x + b, a.y + b, a.z + b }; }
+inline float3 operator-(float3 a, float b) { return { a.x - b, a.y - b, a.z - b }; }
+inline float3 operator*(float3 a, float b) { return { a.x * b, a.y * b, a.z * b }; }
+inline float3 operator/(float3 a, float b) { return { a.x / b, a.y / b, a.z / b }; }
+
+inline float3& operator+=(float3& a, float3 b) { a = a + b; return a; }
+inline float3& operator-=(float3& a, float3 b) { a = a - b; return a; }
+inline float3& operator*=(float3& a, float3 b) { a = a * b; return a; }
+inline float3& operator/=(float3& a, float3 b) { a = a / b; return a; }
+
+inline float3& operator+=(float3& a, float b) { a = a + b; return a; }
+inline float3& operator-=(float3& a, float b) { a = a - b; return a; }
+inline float3& operator*=(float3& a, float b) { a = a * b; return a; }
+inline float3& operator/=(float3& a, float b) { a = a / b; return a; }
 
 inline mat4 mat4Identity()
 {

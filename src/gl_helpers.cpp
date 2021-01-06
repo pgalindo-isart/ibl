@@ -95,7 +95,15 @@ void gl::UploadImage(const char* file)
     else
         printf("Load image '%s' (%dx%d %d channels)\n", file, width, height, channels);
 
-    GLenum format = (channels == 3) ? GL_RGB : GL_RGBA;
+    GLenum format;
+    switch (channels)
+    {
+    case 1:          format = GL_RED;  break;
+    case 2:          format = GL_RG;   break;
+    case 3:          format = GL_RGB;  break;
+    case 4: default: format = GL_RGBA; break;
+    }
+
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, colors);
 
     stbi_image_free(colors);

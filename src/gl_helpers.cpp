@@ -83,14 +83,17 @@ void gl::UploadPerlinNoise(int width, int height, float z, float lacunarity, flo
 
 void gl::UploadImage(const char* file)
 {
-    int width;
-    int height;
-    int channels;
+    int width    = 0;
+    int height   = 0;
+    int channels = 0;
 
     stbi_set_flip_vertically_on_load(1);
     unsigned char* colors = stbi_load(file, &width, &height, &channels, 0);
 
-    printf("Load image '%s' (%dx%d %d channels)\n", file, width, height, channels);
+    if (colors == nullptr)
+        fprintf(stderr, "Failed to load image '%s'\n", file);
+    else
+        printf("Load image '%s' (%dx%d %d channels)\n", file, width, height, channels);
 
     GLenum format = (channels == 3) ? GL_RGB : GL_RGBA;
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, colors);

@@ -2,6 +2,7 @@
 
 #include "glad/glad.h"
 
+#include "camera.hpp"
 #include "demo.hpp"
 
 struct NoiseProperty
@@ -30,4 +31,6 @@ private:
     GLuint texture = 0;
 
     NoiseProperty noiseProps = {};
+
+    Camera mainCamera = {};
 };

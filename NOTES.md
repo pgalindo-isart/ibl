@@ -53,7 +53,7 @@ Divers :
 Autres :
  - https://www.youtube.com/watch?v=4B00hV3wmMY
  - http://www.adriancourreges.com/blog/2016/09/09/doom-2016-graphics-study/
-
+ - https://twitter.com/NoelFB/status/1341287223040217088
 
 1. Setup
 00:00:00 Intro
@@ -91,11 +91,14 @@ Autres :
 # 06/01/2021
 00:00:00 Multitexturing + Multiple color outputs (fbo)
 00:42:00 
+00:01:13 Intégration de la caméra à DemoQuad
 
-- A vous de jouer
-  - Implémenter un effet:
+- À vous de jouer
+  - Implémenter un effet :
     - VFX diablo 2 : https://www.youtube.com/watch?v=YPy2hytwDLM
     - Bloom learnopengl
     - Scrolling texture
 
 - Ne pas modifier les sources
+
+git remote add origin ssh://git@git.isartintra.com:2424/2020/GP_2023_IBL/{nom_du_groupe}.git

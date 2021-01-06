@@ -20,6 +20,8 @@ struct Vertex
 
 DemoQuad::DemoQuad(const DemoInputs& inputs)
 {
+    mainCamera.position = { 0.f, 0.f, 2.f };
+
     // Upload vertex buffer
     {
         // In memory
@@ -119,6 +121,8 @@ DemoQuad::~DemoQuad()
 
 void DemoQuad::UpdateAndRender(const DemoInputs& inputs)
 {
+    mainCamera.UpdateFreeFly(inputs.cameraInputs);
+
     static float time = 0.f;
     time += 1.f / 60.f;
 
@@ -150,7 +154,7 @@ void DemoQuad::UpdateAndRender(const DemoInputs& inputs)
 
     glUseProgram(program);
     mat4 projection = mat4Perspective(calc::ToRadians(60.f), inputs.windowSize.x / inputs.windowSize.y, 0.01f, 50.f);
-    mat4 view       = mat4Translate({ 0.f, 0.f, -2.f });
+    mat4 view       = mainCamera.GetViewMatrix();
     mat4 model      = mat4Translate({ calc::Sin(time * 0.1f * calc::TAU) * 0.1f, 0.f, 0.f }) * mat4RotateY(time) * mat4Scale(2.f);
 
     glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, projection.e);

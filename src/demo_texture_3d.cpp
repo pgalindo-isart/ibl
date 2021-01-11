@@ -9,6 +9,7 @@
 #include "types.hpp"
 #include "calc.hpp"
 #include "gl_helpers.hpp"
+
 #include "demo_texture_3d.hpp"
 
 // Vertex format

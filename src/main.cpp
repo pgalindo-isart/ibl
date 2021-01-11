@@ -17,6 +17,8 @@
 #include "calc.hpp"
 #include "demo_fbo.hpp"
 #include "demo_quad.hpp"
+#include "demo_mipmap.hpp"
+#include "demo_texture_3d.hpp"
 #include "demo_dll_wrapper.hpp"
 
 // TODO: Add demo include here
@@ -134,10 +136,12 @@ int main(int argc, char* argv[])
     demoInputs.windowSize.x = (float)initWidth;
     demoInputs.windowSize.y = (float)initHeight;
 
-    int demoId = 0;
+    int demoId = 2;
     std::vector<Demo*> demos;
     demos.push_back(new DemoQuad(demoInputs));
     demos.push_back(new DemoFBO(demoInputs));
+    demos.push_back(new DemoMipmap(demoInputs));
+    demos.push_back(new DemoTexture3D(demoInputs));
     // TODO: Here, add other demos
     //demos.push_back(new DemoBloom(demoInputs));
 

@@ -32,14 +32,15 @@ CFLAGS=-O0 -g
 CXXFLAGS=$(CFLAGS)
 CPPFLAGS=-Ithird_party/include -MMD
 
+$(USER_OBJS): CXXFLAGS+=-Wall
+
 ifeq ($(TARGET), x86_64-w64-mingw32)
 LDFLAGS=-Lthird_party/libs-$(TARGET)
 LDLIBS=-lglfw3 -lgdi32
 else
+# Probably linux
 LDLIBS=-lglfw -ldl
 endif
-
-$(USER_OBJS): CXXFLAGS+=-Wall
 
 DEPS=$(OBJS:.o=.d)
 

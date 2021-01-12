@@ -1,5 +1,6 @@
 
 #include <cstddef>
+#include <cstdio>
 #include <vector>
 
 #include <imgui.h>

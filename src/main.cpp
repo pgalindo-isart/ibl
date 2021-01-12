@@ -2,9 +2,17 @@
 #include <cstdio>
 #include <vector>
 
+#ifdef _MSC_VER
+#define USE_PAUL_DLL
 #define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
 #define NOMINMAX
+#define DLLEXPORT _declspec(dllexport)
+#endif
 #include <windows.h>
+#else
+#define DLLEXPORT 
+#endif
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -25,8 +33,8 @@
 
 extern "C"
 {
-    _declspec(dllexport) int NvOptimusEnablement = 1;
-    _declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+    DLLEXPORT int NvOptimusEnablement = 1;
+    DLLEXPORT int AmdPowerXpressRequestHighPerformance = 1;
 }
 
 void debugGLCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
@@ -145,8 +153,10 @@ int main(int argc, char* argv[])
     // TODO: Here, add other demos
     //demos.push_back(new DemoBloom(demoInputs));
 
+#ifdef USE_PAUL_DLL
     // Load some demo from dll
     HMODULE paulDemoLib = loadDemosInDll(demos, "ibl-paul.dll", demoInputs);
+#endif
 
     // Various main loop variables
     bool showDemoWindow = false;
@@ -231,7 +241,9 @@ int main(int argc, char* argv[])
     for (Demo* demo : demos)
         delete demo;
 
+#ifdef USE_PAUL_DLL
     FreeLibrary(paulDemoLib);
+#endif
     ImGui_ImplGlfw_Shutdown();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui::DestroyContext();

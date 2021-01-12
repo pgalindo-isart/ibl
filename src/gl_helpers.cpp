@@ -141,7 +141,7 @@ void gl::SetTextureDefaultParams(bool genMipmap)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.f);
 }
 
-
+// TODO: Move dds specific stuff somewhere else
 #define DDS_SURFACE_FLAGS_CUBEMAP 0x00000008 // DDSCAPS_COMPLEX
 
 #define DDS_CUBEMAP_POSITIVEX 0x00000600 // DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_POSITIVEX
@@ -201,34 +201,35 @@ void gl::UploadCubemap(const char* filename)
     // Parse header
     DDSHeader header = {};
     file.read((char*)&header, sizeof(DDSHeader));
+    file.seekg(header.size - sizeof(DDSHeader), std::ios_base::cur); // Jump to data
 
-    // TODO: Check this
-    //file.seekg(std::ios_base::cur, header.size - sizeof(DDSHeader));
-
-    // TODO: Abort loading if not cubemap...
+    // Abort loading if the texture is not a cubemap...
     if ((header.caps  & DDS_SURFACE_FLAGS_CUBEMAP) == 0 || 
         (header.caps2 & DDS_CUBEMAP_ALLFACES)      == 0)
     {
         fprintf(stderr, "Not a cubemap or not complete\n");
+        return;
     }
 
-    printf("dimensions: %dx%d\n", header.width, header.height);
+    // Abort if the format is not supported
+    if (header.pixelFormat.rgbBitCount != 128)
+    {
+        fprintf(stderr, "Only 128 bits (4 floats) textures supported\n");
+        return;
+    }
 
-    // Compute remaining file size
-    int imageSize = header.width * header.height;
-    std::vector<float4> data(imageSize);
-
+    // Parse each texture level and upload them to GPU
+    std::vector<float4> buffer(header.width * header.height); // Buffer size for level 0
     for (int i = 0; i < 6; ++i)
     {
         for (uint32_t level = 0; level <= header.mipMapCount; ++level)
         {
-            int width  = (int)(header.width  / calc::Pow(2, (float)level));
-            int height = (int)(header.height / calc::Pow(2, (float)level));
-            int size   = width * height;
+            int width  = header.width  >> level;
+            int height = header.height >> level;
 
-            file.read((char*)data.data(), size * sizeof(float4));
+            file.read((char*)buffer.data(), width * height * sizeof(float4));
 
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, level, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, data.data());
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, level, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, buffer.data());
         }
     }
 }

@@ -2,13 +2,13 @@
 #include <cstdio>
 #include <vector>
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__MINGW32__)
 #define USE_PAUL_DLL
 #define WIN32_LEAN_AND_MEAN
 #ifndef NOMINMAX
 #define NOMINMAX
-#define DLLEXPORT _declspec(dllexport)
 #endif
+#define DLLEXPORT __declspec(dllexport)
 #include <windows.h>
 #else
 #define DLLEXPORT 

@@ -1,7 +1,14 @@
+# User generated files
 *.user
 .vs
 x64
 imgui.ini
-src-priv
-ibl-paul*
 media/*.cache
+
+# GCC specific
+**/src/*.o
+**/src/*.d
+
+# Private project specifics
+ibl-paul*
+src-priv

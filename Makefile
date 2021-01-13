@@ -26,7 +26,6 @@ USER_OBJS+=\
 	src/main.o \
 	src/mesh_builder.o
 
-OBJS=$(THIRD_PARTY_OBJS) $(USER_OBJS)
 
 TARGET?=$(shell $(CC) -dumpmachine)
 CFLAGS=-O0 -g
@@ -36,6 +35,7 @@ CPPFLAGS=-Ithird_party/include -MMD
 $(USER_OBJS): CXXFLAGS+=-Wall
 
 ifeq ($(TARGET), x86_64-w64-mingw32)
+USER_OBJS+=src/demo_dll_wrapper.o
 LDFLAGS=-Lthird_party/libs-$(TARGET)
 LDLIBS=-lglfw3 -lgdi32
 else
@@ -43,6 +43,7 @@ else
 LDLIBS=-lglfw -ldl
 endif
 
+OBJS=$(THIRD_PARTY_OBJS) $(USER_OBJS)
 DEPS=$(OBJS:.o=.d)
 
 all: $(OUTPUT)

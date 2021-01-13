@@ -3,20 +3,21 @@ OUTPUT=ibl
 
 THIRD_PARTY_OBJS=\
 	third_party/src/glad.o \
-	third_party/src/stb_perlin.o \
-	third_party/src/stb_image.o \
-	third_party/src/tiny_obj_loader.o \
 	third_party/src/imgui.o \
 	third_party/src/imgui_demo.o \
 	third_party/src/imgui_draw.o \
+	third_party/src/imgui_impl_glfw.o \
+	third_party/src/imgui_impl_opengl3.o \
 	third_party/src/imgui_tables.o \
 	third_party/src/imgui_widgets.o \
-	third_party/src/imgui_impl_glfw.o \
-	third_party/src/imgui_impl_opengl3.o
+	third_party/src/stb_perlin.o \
+	third_party/src/stb_image.o \
+	third_party/src/tiny_obj_loader.o
 
 USER_OBJS+=\
 	src/camera.o \
 	src/data.o \
+	src/demo_cubemap.o \
 	src/demo_fbo.o \
 	src/demo_mipmap.o \
 	src/demo_quad.o \

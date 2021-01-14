@@ -121,6 +121,11 @@ inline float3 v3Normalize(float3 v)
     return v / v3Length(v);
 }
 
+inline float3 v3Cross(float3 a, float3 b)
+{
+    return { a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x };
+}
+
 inline mat4 mat4Identity()
 {
     return

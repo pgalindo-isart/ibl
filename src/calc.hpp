@@ -189,9 +189,22 @@ inline mat4 mat4RotateY(float radians)
     float s = calc::Sin(radians);
     return
     {
-          c, 0.f,  -s, 0.f,
+        c, 0.f,  -s, 0.f,
         0.f, 1.f, 0.f, 0.f,
-          s, 0.f,   c, 0.f,
+        s, 0.f,   c, 0.f,
+        0.f, 0.f, 0.f, 1.f,
+    };
+}
+
+inline mat4 mat4RotateZ(float radians)
+{
+    float c = calc::Cos(radians);
+    float s = calc::Sin(radians);
+    return
+    {
+          c,   s, 0.f, 0.f,
+         -s,   c, 0.f, 0.f,
+        0.f, 0.f, 1.f, 0.f,
         0.f, 0.f, 0.f, 1.f,
     };
 }

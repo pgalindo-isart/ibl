@@ -179,7 +179,7 @@ DemoNormalMap::DemoNormalMap(const DemoInputs& inputs)
     {
         glGenTextures(1, &purpleTexture);
         glBindTexture(GL_TEXTURE_2D, purpleTexture);
-        gl::UploadColoredTexture(0.f, 0.f, 1.f, 1.f);
+        gl::UploadColoredTexture(0.5f, 0.5f, 1.f, 1.f);
         gl::SetTextureDefaultParams();
     }
 }

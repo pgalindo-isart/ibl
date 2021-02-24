@@ -12,9 +12,10 @@
 #include "gl_helpers.hpp"
 
 // Implement dumb caching to avoid decompressing textures
-static bool LoadTextureFromCache(void** data, const char* filename, int* width, int* height, int* channels, bool linear)
+static bool LoadTextureFromCache(void** data, const char* filename, int* width, int* height, int* channels, bool linear, bool flip)
 {
     std::string cachedFile = filename;
+    cachedFile += flip ? "_flip" : "_noflip";
     cachedFile += linear ? ".texf" : ".tex";
     cachedFile += ".cache";
 
@@ -36,9 +37,10 @@ static bool LoadTextureFromCache(void** data, const char* filename, int* width, 
     return true;
 }
 
-static void SaveTextureToCache(const void* data, size_t dataSize, const char* filename, int width, int height, int channels, bool linear)
+static void SaveTextureToCache(const void* data, size_t dataSize, const char* filename, int width, int height, int channels, bool linear, bool flip)
 {
     std::string cachedFile = filename;
+    cachedFile += flip ? "_flip" : "_noflip";
     cachedFile += linear ? ".texf" : ".tex";
     cachedFile += ".cache";
 
@@ -133,16 +135,16 @@ void gl::UploadPerlinNoise(int width, int height, float z, float lacunarity, flo
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, pixels.data());
 }
 
-void gl::UploadImage(const char* file, bool linear)
+void gl::UploadImage(const char* file, bool linear, bool flip)
 {
     int width    = 0;
     int height   = 0;
     int channels = 0;
 
-    stbi_set_flip_vertically_on_load(1);
+    stbi_set_flip_vertically_on_load(flip);
     void* colors;
 
-    if (!LoadTextureFromCache(&colors, file, &width, &height, &channels, linear))
+    if (!LoadTextureFromCache(&colors, file, &width, &height, &channels, linear, flip))
     {
         if (linear)
             colors = stbi_loadf(file, &width, &height, &channels, 0);
@@ -155,7 +157,7 @@ void gl::UploadImage(const char* file, bool linear)
             printf("Load image '%s' (%dx%d %d channels)\n", file, width, height, channels);
 
         int byteSize = width * height * channels * (linear ? sizeof(float) : sizeof(char));
-        SaveTextureToCache(colors, byteSize, file, width, height, channels, linear);
+        SaveTextureToCache(colors, byteSize, file, width, height, channels, linear, flip);
     }
 
     GLenum format;

@@ -67,6 +67,7 @@ namespace calc
     }
 
     inline float ToRadians(float degrees) { return degrees * TAU / 360.f; }
+    inline float ToDegrees(float radians) { return radians * 360.f / TAU; }
 }
 
 inline float2 operator-(float2 a) { return { -a.x, -a.y }; }
@@ -111,6 +112,13 @@ inline float3& operator-=(float3& a, float b) { a = a - b; return a; }
 inline float3& operator*=(float3& a, float b) { a = a * b; return a; }
 inline float3& operator/=(float3& a, float b) { a = a / b; return a; }
 
+inline float4 operator/(float4 a, float b) { return { a.x / b, a.y / b, a.z / b, a.w / b }; }
+
+inline float v2Length(float2 v)
+{
+    return calc::Sqrt(v.x * v.x + v.y * v.y);
+}
+
 inline float v3Length(float3 v)
 {
     return calc::Sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
@@ -124,6 +132,11 @@ inline float3 v3Normalize(float3 v)
 inline float3 v3Cross(float3 a, float3 b)
 {
     return { a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x };
+}
+
+inline float v3Dot(float3 a, float3 b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 inline mat4 mat4Identity()
@@ -209,6 +222,38 @@ inline mat4 mat4RotateZ(float radians)
     };
 }
 
+inline mat4 mat4FromQuat(quat q)
+{
+    mat4 m = {};
+    float a = q.e[3];
+    float b = q.e[0];
+    float c = q.e[1];
+    float d = q.e[2];
+    float a2 = a*a;
+    float b2 = b*b;
+    float c2 = c*c;
+    float d2 = d*d;
+
+    m.c[0].e[0] = a2 + b2 - c2 - d2;
+    m.c[0].e[1] = 2.f*(b*c + a*d);
+    m.c[0].e[2] = 2.f*(b*d - a*c);
+    m.c[0].e[3] = 0.f;
+
+    m.c[1].e[0] = 2*(b*c - a*d);
+    m.c[1].e[1] = a2 - b2 + c2 - d2;
+    m.c[1].e[2] = 2.f*(c*d + a*b);
+    m.c[1].e[3] = 0.f;
+
+    m.c[2].e[0] = 2.f*(b*d + a*c);
+    m.c[2].e[1] = 2.f*(c*d - a*b);
+    m.c[2].e[2] = a2 - b2 - c2 + d2;
+    m.c[2].e[3] = 0.f;
+
+    m.c[3].e[0] = m.c[3].e[1] = m.c[3].e[2] = 0.f;
+    m.c[3].e[3] = 1.f;
+    return m;
+}
+
 inline mat4 mat4Transpose(const mat4& m)
 {
     return {
@@ -268,6 +313,131 @@ inline mat4 mat4Perspective(float yFov, float aspect, float n, float f)
 
     return m;
 }
+
+
+inline mat4 mat4Inverse(const mat4& m)
+{
+    float s[6];
+    s[0] = m.c[0].e[0] * m.c[1].e[1] - m.c[1].e[0] * m.c[0].e[1];
+    s[1] = m.c[0].e[0] * m.c[1].e[2] - m.c[1].e[0] * m.c[0].e[2];
+    s[2] = m.c[0].e[0] * m.c[1].e[3] - m.c[1].e[0] * m.c[0].e[3];
+    s[3] = m.c[0].e[1] * m.c[1].e[2] - m.c[1].e[1] * m.c[0].e[2];
+    s[4] = m.c[0].e[1] * m.c[1].e[3] - m.c[1].e[1] * m.c[0].e[3];
+    s[5] = m.c[0].e[2] * m.c[1].e[3] - m.c[1].e[2] * m.c[0].e[3];
+
+    float c[6];
+    c[0] = m.c[2].e[0] * m.c[3].e[1] - m.c[3].e[0] * m.c[2].e[1];
+    c[1] = m.c[2].e[0] * m.c[3].e[2] - m.c[3].e[0] * m.c[2].e[2];
+    c[2] = m.c[2].e[0] * m.c[3].e[3] - m.c[3].e[0] * m.c[2].e[3];
+    c[3] = m.c[2].e[1] * m.c[3].e[2] - m.c[3].e[1] * m.c[2].e[2];
+    c[4] = m.c[2].e[1] * m.c[3].e[3] - m.c[3].e[1] * m.c[2].e[3];
+    c[5] = m.c[2].e[2] * m.c[3].e[3] - m.c[3].e[2] * m.c[2].e[3];
+
+    // assuming it is invertible
+    float invdet = 1.0f / (s[0] * c[5] - s[1] * c[4] + s[2] * c[3] + s[3] * c[2] - s[4] * c[1] + s[5] * c[0]);
+
+    mat4 r;
+    r.c[0].e[0] = +(m.c[1].e[1] * c[5] - m.c[1].e[2] * c[4] + m.c[1].e[3] * c[3]) * invdet;
+    r.c[0].e[1] = -(m.c[0].e[1] * c[5] - m.c[0].e[2] * c[4] + m.c[0].e[3] * c[3]) * invdet;
+    r.c[0].e[2] = +(m.c[3].e[1] * s[5] - m.c[3].e[2] * s[4] + m.c[3].e[3] * s[3]) * invdet;
+    r.c[0].e[3] = -(m.c[2].e[1] * s[5] - m.c[2].e[2] * s[4] + m.c[2].e[3] * s[3]) * invdet;
+
+    r.c[1].e[0] = -(m.c[1].e[0] * c[5] - m.c[1].e[2] * c[2] + m.c[1].e[3] * c[1]) * invdet;
+    r.c[1].e[1] = +(m.c[0].e[0] * c[5] - m.c[0].e[2] * c[2] + m.c[0].e[3] * c[1]) * invdet;
+    r.c[1].e[2] = -(m.c[3].e[0] * s[5] - m.c[3].e[2] * s[2] + m.c[3].e[3] * s[1]) * invdet;
+    r.c[1].e[3] = +(m.c[2].e[0] * s[5] - m.c[2].e[2] * s[2] + m.c[2].e[3] * s[1]) * invdet;
+
+    r.c[2].e[0] = +(m.c[1].e[0] * c[4] - m.c[1].e[1] * c[2] + m.c[1].e[3] * c[0]) * invdet;
+    r.c[2].e[1] = -(m.c[0].e[0] * c[4] - m.c[0].e[1] * c[2] + m.c[0].e[3] * c[0]) * invdet;
+    r.c[2].e[2] = +(m.c[3].e[0] * s[4] - m.c[3].e[1] * s[2] + m.c[3].e[3] * s[0]) * invdet;
+    r.c[2].e[3] = -(m.c[2].e[0] * s[4] - m.c[2].e[1] * s[2] + m.c[2].e[3] * s[0]) * invdet;
+
+    r.c[3].e[0] = -(m.c[1].e[0] * c[3] - m.c[1].e[1] * c[1] + m.c[1].e[2] * c[0]) * invdet;
+    r.c[3].e[1] = +(m.c[0].e[0] * c[3] - m.c[0].e[1] * c[1] + m.c[0].e[2] * c[0]) * invdet;
+    r.c[3].e[2] = -(m.c[3].e[0] * s[3] - m.c[3].e[1] * s[1] + m.c[3].e[2] * s[0]) * invdet;
+    r.c[3].e[3] = +(m.c[2].e[0] * s[3] - m.c[2].e[1] * s[1] + m.c[2].e[2] * s[0]) * invdet;
+
+    return r;
+}
+
+inline mat3 mat3Identity()
+{
+    return
+    {
+        1.f, 0.f, 0.f,
+        0.f, 1.f, 0.f,
+        0.f, 0.f, 1.f,
+    };
+}
+
+inline mat3 mat3Transpose(const mat3& m)
+{
+    return {
+        m.c[0].e[0], m.c[1].e[0], m.c[2].e[0],
+        m.c[0].e[1], m.c[1].e[1], m.c[2].e[1],
+        m.c[0].e[2], m.c[1].e[2], m.c[2].e[2],
+    };
+}
+
+inline mat3 mat3Translate(float2 t)
+{
+    return
+    {
+        1.f, 0.f, 0.f,
+        0.f, 1.f, 0.f,
+        t.x, t.y, 1.f,
+    };
+}
+
+inline mat3 mat3Rotate(float radians)
+{
+    float c = calc::Cos(radians);
+    float s = calc::Sin(radians);
+    return
+    {
+          c,   s, 0.f,
+         -s,   c, 0.f,
+        0.f, 0.f, 1.f,
+    };
+}
+
+inline mat3 operator*(const mat3& a, const mat3& b)
+{
+    mat3 res = {};
+    for (int c = 0; c < 3; ++c)
+        for (int r = 0; r < 3; ++r)
+            for (int k = 0; k < 3; ++k)
+                res.c[c].e[r] += a.c[k].e[r] * b.c[c].e[k];
+    return res;
+}
+
+inline mat3& operator*=(mat3& a, const mat3& b) { a = a * b; return a; }
+
+inline float3 operator*(const mat3& m, float3 v)
+{
+    float3 r;
+    r.x = v.x * m.c[0].e[0] + v.y * m.c[1].e[0] + v.z * m.c[2].e[0];
+    r.y = v.x * m.c[0].e[1] + v.y * m.c[1].e[1] + v.z * m.c[2].e[1];
+    r.z = v.x * m.c[0].e[2] + v.y * m.c[1].e[2] + v.z * m.c[2].e[2];
+    return r;
+}
+
+inline mat3 operator*(float s, const mat3& m)
+{
+    mat3 res = m;
+    for (int i = 0; i < ARRAYSIZE(res.e); ++i)
+        res.e[i] *= s;
+    return res;
+}
+
+inline mat3 operator+(const mat3& a, const mat3& b)
+{
+    mat3 res = {};
+    for (int i = 0; i < ARRAYSIZE(res.e); ++i)
+        res.e[i] = a.e[i] + b.e[i];
+    return res;
+}
+inline mat3 operator+=(mat3& a, const mat3& b) { a = a + b; return a; }
 
 #ifdef USE_CALC_EXT
 #include "calc_ext.hpp"

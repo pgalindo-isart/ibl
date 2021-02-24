@@ -18,13 +18,14 @@ union float3
         : x(x), y(y), z(z)
     {}
 
-    float3 (float2 xy, float z)
+    float3(float2 xy, float z)
         : x(xy.x), y(xy.y), z(z)
     {}
 
     float e[3];
     struct { float x; float y; float z; };
     struct { float r; float g; float b; };
+    float2 xy;
 };
 
 union float4
@@ -34,18 +35,31 @@ union float4
         : x(x), y(y), z(z), w(w)
     {}
 
-    float4 (float3 xyz, float w)
+    float4(float3 xyz, float w)
         : x(xyz.x), y(xyz.y), z(xyz.z), w(w)
+    {}
+
+    float4(float2 xy, float z, float w)
+        : x(xy.x), y(xy.y), z(z), w(w)
     {}
 
     struct { float x; float y; float z; float w; };
     struct { float r; float g; float b; float a; };
+    float2 xy;
     float3 xyz;
     float e[4];
 };
+
+typedef float4 quat;
 
 union mat4
 {
     float e[16];
     float4 c[4];
+};
+
+union mat3
+{
+    float e[9];
+    float3 c[3];
 };
